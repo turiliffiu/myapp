@@ -1,70 +1,75 @@
 # Changelog
 
-Tutte le modifiche notevoli a questo progetto saranno documentate in questo file.
+All notable changes to this project will be documented in this file.
 
-Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/),
-e questo progetto aderisce a [Semantic Versioning](https://semver.org/lang/it/).
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.2.0] - 2026-02-01
 
-### Pianificato
-- Feature X
-- Feature Y
+### Fixed
+- **CRITICAL**: Removed deprecated `default_app_config` from `apps/__init__.py` (incompatible with Django 4.0+)
+- **CRITICAL**: Fixed signals.py with lazy import to prevent `AppRegistryNotReady` error
+- Added support for both SQLite and PostgreSQL in settings.py with automatic detection
+- Fixed database config with default empty values for SQLite compatibility
+- Added root URL redirect to login page (fixes 404 on homepage)
+- Updated .env.example with DB_ENGINE variable and examples for both databases
 
----
+### Changed
+- Database configuration now requires `DB_ENGINE` in .env
+- SQLite no longer requires DB_USER/DB_PASS/DB_HOST/DB_PORT values
+
+### Migration Guide v1.1.0 → v1.2.0
+For existing projects using this template:
+
+**SQLite (Development):**
+```env
+DB_ENGINE=django.db.backends.sqlite3
+DB_NAME=db.sqlite3
+DB_USER=
+DB_PASS=
+DB_HOST=
+DB_PORT=
+```
+
+**PostgreSQL (Production):**
+```env
+DB_ENGINE=django.db.backends.postgresql
+DB_NAME=your_db_name
+DB_USER=your_db_user
+DB_PASS=your_password
+DB_HOST=localhost
+DB_PORT=5432
+```
+
+## [1.1.0] - 2026-02-01
+
+### Added
+- Complete Django 5.0 application code
+- Authentication system (login/register/logout with rate limiting)
+- User profiles with role-based permissions (admin/editor/viewer)
+- REST API with Django REST Framework
+- Tailwind CSS + Alpine.js frontend (zero build required)
+- Responsive templates (mobile-first design)
+- Management commands (create_admin, seed_db)
+- Security middleware and headers
+- PostgreSQL configuration
+- pytest test suite with examples
+- Automated setup and deploy scripts
+- CI/CD with GitHub Actions
 
 ## [1.0.0] - 2026-02-01
 
-### Aggiunto
-- Setup iniziale progetto Django 5.0
-- Sistema autenticazione completo (login/logout/registrazione)
-- Gestione profili utente con ruoli (admin/editor/viewer)
-- API REST con Django REST Framework
-- Script setup automatico (`scripts/setup.sh`)
-- Script deploy automatico (`scripts/deploy.sh`)
-- Configurazione Gunicorn + Nginx
-- Support PostgreSQL 16
-- Rate limiting su autenticazione
-- Security headers middleware
-- Documentazione completa README.md
-- Guida contributi CONTRIBUTING.md
-- CI/CD con GitHub Actions
-- Template Tailwind CSS + Alpine.js
+### Added
+- Initial template structure
+- Complete documentation (README, CONTRIBUTING, SECURITY, TEMPLATE_GUIDE)
+- Requirements.txt with Django 5.0 dependencies
+- .env.example configuration
+- .gitignore for Python/Django projects
+- MIT License
+- AUTHORS.md and CHANGELOG.md
+- Verification script
 
-### Modificato
-- N/A (release iniziale)
-
-### Deprecato
-- N/A
-
-### Rimosso
-- N/A
-
-### Corretto
-- N/A
-
-### Sicurezza
-- Implementato CSRF protection
-- Rate limiting anti-brute force
-- HTTPS enforcement in produzione
-- Security headers (CSP, HSTS, X-Frame-Options)
-
----
-
-## Formato Versioni
-
-- **MAJOR**: Breaking changes
-- **MINOR**: Nuove feature (backward compatible)
-- **PATCH**: Bug fix (backward compatible)
-
-## Tag Git
-
-Le release sono taggate su GitHub:
-- `v1.0.0` - Release iniziale
-- `v1.1.0` - Prossima minor release
-- `v2.0.0` - Prossima major release
-
----
-
-[Unreleased]: https://github.com/username/repo/compare/v1.0.0...HEAD
-[1.0.0]: https://github.com/username/repo/releases/tag/v1.0.0
+[1.2.0]: https://github.com/turiliffiu/demo_app/compare/v1.1.0...v1.2.0
+[1.1.0]: https://github.com/turiliffiu/demo_app/compare/v1.0.0...v1.1.0
+[1.0.0]: https://github.com/turiliffiu/demo_app/releases/tag/v1.0.0
