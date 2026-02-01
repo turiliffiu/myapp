@@ -1,0 +1,79 @@
+<!-- Navbar responsive con Alpine.js per il menu mobile -->
+<nav x-data="{ open: false }" class="bg-white shadow-sm border-b border-gray-200">
+    <div class="max-w-7xl mx-auto px-4">
+        <div class="flex h-16 items-center justify-between">
+
+            <!-- Logo -->
+            <a href="{% if user.is_authenticated %}{% url 'core:dashboard' %}{% else %}{% url 'core:login' %}{% endif %}"
+               class="text-xl font-bold text-blue-600">MyApp</a>
+
+            <!-- Desktop Nav -->
+            <div class="hidden md:flex items-center gap-1">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'core:dashboard' %}"
+                       class="px-4 py-2 rounded-lg text-sm font-medium transition-colors
+                              {% if request.path == '/dashboard/' %}bg-blue-50 text-blue-700{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
+                        Dashboard
+                    </a>
+                    <a href="{% url 'core:profile' %}"
+                       class="px-4 py-2 rounded-lg text-sm font-medium transition-colors
+                              {% if request.path == '/profile/' %}bg-blue-50 text-blue-700{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
+                        Profilo
+                    </a>
+
+                    <!-- Logout -->
+                    <a href="{% url 'core:logout' %}"
+                       class="ml-3 px-4 py-2 rounded-lg text-sm font-medium text-gray-500 hover:bg-gray-100 transition-colors">
+                        Logout
+                    </a>
+                {% else %}
+                    <a href="{% url 'core:login' %}"
+                       class="px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100">
+                        Login
+                    </a>
+                    <a href="{% url 'core:register' %}"
+                       class="px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700">
+                        Registrati
+                    </a>
+                {% endif %}
+            </div>
+
+            <!-- Mobile: Hamburger -->
+            {% if user.is_authenticated %}
+            <button @click="open = !open" class="md:hidden p-2 rounded-lg hover:bg-gray-100">
+                <svg x-show="!open" class="h-6 w-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
+                <svg x-show="open" class="h-6 w-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+            {% else %}
+            <div class="flex md:hidden gap-2">
+                <a href="{% url 'core:login' %}"  class="px-3 py-1.5 rounded-lg text-sm font-medium border text-gray-600">Login</a>
+                <a href="{% url 'core:register' %}" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-blue-600 text-white">Registrati</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Menu Mobile -->
+    {% if user.is_authenticated %}
+    <div x-show="open" class="md:hidden border-t bg-white px-4 py-3 flex flex-col gap-1">
+        <a href="{% url 'core:dashboard' %}" @click="open = false"
+           class="px-4 py-3 rounded-lg text-sm font-medium
+                  {% if request.path == '/dashboard/' %}bg-blue-50 text-blue-700{% else %}text-gray-700 hover:bg-gray-100{% endif %}">
+            Dashboard
+        </a>
+        <a href="{% url 'core:profile' %}" @click="open = false"
+           class="px-4 py-3 rounded-lg text-sm font-medium
+                  {% if request.path == '/profile/' %}bg-blue-50 text-blue-700{% else %}text-gray-700 hover:bg-gray-100{% endif %}">
+            Profilo
+        </a>
+        <a href="{% url 'core:logout' %}" @click="open = false"
+           class="mt-2 px-4 py-3 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50">
+            Logout
+        </a>
+    </div>
+    {% endif %}
+</nav>

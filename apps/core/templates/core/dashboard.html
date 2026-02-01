@@ -1,0 +1,41 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Dashboard — MyApp{% endblock %}
+
+{% block content %}
+<!-- Header pagina -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+    <div>
+        <h1 class="text-2xl font-bold text-gray-800">Dashboard</h1>
+        <p class="text-sm text-gray-500 mt-0.5">Benvenuto, {{ user.username }}</p>
+    </div>
+</div>
+
+<!-- Griglia card statistiche -->
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-4">
+        <p class="text-xs text-gray-400 uppercase tracking-wide">Ruolo</p>
+        <p class="text-lg font-semibold text-gray-800 mt-1">{{ profile.get_role_display }}</p>
+    </div>
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-4">
+        <p class="text-xs text-gray-400 uppercase tracking-wide">Stato</p>
+        <p class="text-lg font-semibold text-green-600 mt-1">Attivo</p>
+    </div>
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-4">
+        <p class="text-xs text-gray-400 uppercase tracking-wide">Iscrizione</p>
+        <p class="text-lg font-semibold text-gray-800 mt-1">{{ user.date_joined|date:"d/m/Y" }}</p>
+    </div>
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-4">
+        <p class="text-xs text-gray-400 uppercase tracking-wide">Ultimo Login</p>
+        <p class="text-lg font-semibold text-gray-800 mt-1">{{ user.last_login|date:"d/m H:i"|default:"—" }}</p>
+    </div>
+</div>
+
+<!-- Contenuto principale -->
+<div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+    <h2 class="text-base font-semibold text-gray-800 mb-3">Contenuto</h2>
+    <p class="text-sm text-gray-500">
+        Sostituisci questa sezione con i componenti delle tue app del dominio.
+    </p>
+</div>
+{% endblock %}

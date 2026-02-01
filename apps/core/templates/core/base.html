@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}MyApp{% endblock %}</title>
+
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Alpine.js: reattività leggera -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
+
+    <!-- CSRF Token per AJAX -->
+    <meta name="csrf-token" content="{{ csrf_token }}">
+
+    {% block extra_head %}{% endblock %}
+</head>
+
+<body class="min-h-screen bg-gray-50 flex flex-col">
+
+    <!-- Navbar responsive -->
+    {% include 'core/navbar.html' %}
+
+    <!-- Main content -->
+    <main class="flex-1 w-full max-w-7xl mx-auto px-4 py-6">
+        <!-- Flash messages Django -->
+        {% include 'core/messages.html' %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t bg-white mt-auto">
+        <div class="max-w-7xl mx-auto px-4 py-3 text-center text-xs text-gray-400">
+            MyApp &copy; {% now "Y" %}
+        </div>
+    </footer>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
