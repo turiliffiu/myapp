@@ -1,765 +1,462 @@
-# 🎯 [NOME PROGETTO]
+# 🚀 MyApp - Application Hub with SSO
 
 <div align="center">
 
 ![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
-![Django](https://img.shields.io/badge/Django-5.0-green.svg)
+![Django](https://img.shields.io/badge/Django-5.2-green.svg)
 ![Python](https://img.shields.io/badge/Python-3.12-blue.svg)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue.svg)
-![License](https://img.shields.io/badge/license-MIT-green.svg)
+![JWT](https://img.shields.io/badge/JWT-Authentication-orange.svg)
 
-**[BREVE DESCRIZIONE PROGETTO]**
+**Piattaforma centralizzata per gestire multiple applicazioni web con autenticazione SSO**
 
-[Demo](#demo) • [Features](#features) • [Installazione](#installazione) • [Deploy](#deploy)
+[Features](#features) • [Demo](#demo) • [Installazione](#installazione) • [API](#api-sso) • [Deployment](#deployment)
 
 </div>
 
 ---
 
-## 📖 Indice
-
-- [Descrizione](#descrizione)
-- [Features](#features)
-- [Stack Tecnologico](#stack-tecnologico)
-- [Requisiti](#requisiti)
-- [Installazione Rapida](#installazione-rapida)
-- [Installazione Manuale](#installazione-manuale)
-- [Configurazione](#configurazione)
-- [Deploy Produzione](#deploy-produzione)
-- [Utilizzo](#utilizzo)
-- [API](#api)
-- [Struttura Progetto](#struttura-progetto)
-- [Development](#development)
-- [Testing](#testing)
-- [Troubleshooting](#troubleshooting)
-- [Contributi](#contributi)
-- [Licenza](#licenza)
-
----
-
 ## 📋 Descrizione
 
-[DESCRIZIONE DETTAGLIATA DEL PROGETTO]
+**MyApp** è un hub centralizzato per gestire e accedere a multiple applicazioni web con un'unica autenticazione SSO basata su JWT. Perfetto per creare portali aziendali, dashboard integrate o sistemi multi-app.
 
-### 🎯 Obiettivi
+### 🎯 Caratteristiche Principali
 
-- ✅ [Obiettivo 1]
-- ✅ [Obiettivo 2]
-- ✅ [Obiettivo 3]
-- ⏳ [Obiettivo futuro]
+- ✅ **Hub Applicazioni** con grid responsive e card colorate
+- ✅ **4 Tipi di App**: Internal URL, External URL, HTML Page, iFrame
+- ✅ **SSO API** con JWT authentication (1h access token, 7 giorni refresh)
+- ✅ **Sistema Permessi** role-based (admin/editor/viewer)
+- ✅ **App Demo** incluse: Calcolatrice, SSO Dashboard
+- ✅ **Admin Interface** completa per gestione app
+- ✅ **Modern UI** con Tailwind CSS e gradienti personalizzabili
 
 ---
 
 ## ✨ Features
 
-### 🔐 Autenticazione
-- [x] Sistema completo login/logout/registrazione
-- [x] Gestione profili utente con ruoli (admin/editor/viewer)
-- [x] Password validation e reset
-- [x] Protezione CSRF e sicurezza avanzata
+### 🔐 Autenticazione SSO
+- JWT-based authentication
+- Access token (1 ora) + Refresh token (7 giorni)
+- API RESTful per integrazione con app esterne
+- Dashboard interattiva per test API
+
+### 🗂️ Application Hub
+- Grid responsive con card colorate
+- Supporto 4 tipi di applicazioni:
+  - **Internal URL**: App Django interne
+  - **External URL**: Link esterni con redirect
+  - **HTML Page**: App HTML complete self-contained
+  - **iFrame**: Embed app esterne in iframe
+- Gradienti colore personalizzabili per ogni app
+- Sistema categorie opzionale
+- Click counter e statistiche
+
+### 👥 Sistema Permessi
+- **Admin**: Accesso completo + gestione app
+- **Editor**: Accesso app assegnate
+- **Viewer**: Sola visualizzazione
+- Controllo granulare per ogni app
 
 ### 🎨 UI/UX
-- [x] Design moderno con Tailwind CSS
-- [x] Interfaccia responsive (mobile-first)
-- [x] Componenti riutilizzabili
-- [x] Alpine.js per interattività leggera
+- Design moderno con Bootstrap 5 + Tailwind CSS
+- Grid responsive (1-4 colonne)
+- Hover effects e animazioni smooth
+- Breadcrumb navigation
+- Dark/light theme ready
 
-### 🔌 API
-- [x] REST API completa con Django REST Framework
-- [x] Autenticazione JWT/Session
-- [x] Documentazione API automatica
-- [x] Pagination e filtering
+---
 
-### 🔒 Sicurezza
-- [x] Rate limiting su autenticazione
-- [x] HTTPS automatico in produzione
-- [x] Security headers (CSP, HSTS, X-Frame-Options)
-- [x] SQL injection prevention (Django ORM)
-- [x] XSS protection automatica
+## 🖼️ Screenshots
+
+### Homepage - App Hub
+![App Hub](docs/screenshots/app-hub.png)
+
+### SSO Dashboard Demo
+![SSO Dashboard](docs/screenshots/sso-dashboard.png)
+
+### Admin Interface
+![Admin](docs/screenshots/admin.png)
 
 ---
 
 ## 🛠️ Stack Tecnologico
 
 ### Backend
-- **Framework:** Django 5.0
-- **Python:** 3.12+
-- **Database:** PostgreSQL 16
-- **API:** Django REST Framework
-- **Task Queue:** Celery + Redis (opzionale)
-- **WSGI:** Gunicorn
+- **Framework**: Django 5.2
+- **Auth**: djangorestframework-simplejwt
+- **Database**: PostgreSQL (produzione) / SQLite (sviluppo)
+- **API**: Django REST Framework
 
 ### Frontend
-- **CSS:** Tailwind CSS (CDN)
-- **JS:** Alpine.js (CDN)
-- **Icons:** Heroicons inline SVG
+- **CSS**: Bootstrap 5 + Tailwind CSS
+- **JavaScript**: Vanilla JS (ES6+)
+- **Icons**: Emoji native
 
-### Infrastructure
-- **Web Server:** Nginx
-- **OS:** Ubuntu 24.04 LTS
-- **Virtualizzazione:** Proxmox LXC (opzionale)
-- **Version Control:** Git + GitHub
+### Deployment
+- **Server**: Gunicorn + Nginx
+- **OS**: Ubuntu 24.04 LTS
+- **SSL**: Let's Encrypt (opzionale)
 
 ---
 
-## 📋 Requisiti
+## 📦 Installazione
 
-### Sistema Operativo
-- Ubuntu 24.04 LTS / Debian 12+
-- 2 CPU cores
-- 2GB RAM minimo
-- 20GB disco
-
-### Software
+### Requisiti
 - Python 3.12+
-- PostgreSQL 16+
-- Nginx
+- PostgreSQL 16+ (produzione)
 - Git
 
----
-
-## 🚀 Installazione Rapida
-
-### Setup Automatico (Raccomandato)
+### Setup Rapido
 ```bash
 # 1. Clone repository
-git clone https://github.com/username/[NOME_REPO].git
-cd [NOME_REPO]
+git clone https://github.com/turiliffiu/myapp.git
+cd myapp
 
-# 2. Esegui setup automatico
-chmod +x scripts/setup.sh
-./scripts/setup.sh
-
-# 3. Avvia development server
+# 2. Virtual environment
+python3 -m venv venv
 source venv/bin/activate
-python manage.py runserver 0.0.0.0:8000
-```
 
-**Vai su:** http://localhost:8000
-
-Lo script `setup.sh` esegue automaticamente:
-- ✅ Creazione virtual environment
-- ✅ Installazione dipendenze
-- ✅ Generazione SECRET_KEY
-- ✅ Setup database PostgreSQL
-- ✅ Migrations
-- ✅ Creazione superuser
-- ✅ Collectstatic
-
----
-
-## 🔧 Installazione Manuale
-
-<details>
-<summary>Clicca per espandere istruzioni dettagliate</summary>
-
-### 1. Clone e Setup Virtual Environment
-```bash
-git clone https://github.com/username/[NOME_REPO].git
-cd [NOME_REPO]
-
-python3.12 -m venv venv
-source venv/bin/activate
-pip install --upgrade pip
+# 3. Installa dipendenze
 pip install -r requirements.txt
-```
 
-### 2. PostgreSQL Setup
-```bash
-# Installa PostgreSQL
-sudo apt update
-sudo apt install -y postgresql postgresql-contrib
-
-# Crea database e utente
-sudo -u postgres psql << 'EOSQL'
-CREATE DATABASE myapp_db;
-CREATE USER myapp_user WITH PASSWORD 'changeme_strong_password';
-ALTER USER myapp_user CREATEDB;
-GRANT ALL PRIVILEGES ON DATABASE myapp_db TO myapp_user;
-\q
-EOSQL
-```
-
-### 3. Configurazione Ambiente
-```bash
+# 4. Configura .env
 cp .env.example .env
-nano .env
-```
+nano .env  # Modifica SECRET_KEY e DB credentials
 
-Modifica `.env`:
-```env
-DEBUG=True
-SECRET_KEY=[genera con: python manage.py shell -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"]
-ALLOWED_HOSTS=localhost,127.0.0.1
-
-DB_NAME=myapp_db
-DB_USER=myapp_user
-DB_PASS=changeme_strong_password
-DB_HOST=localhost
-DB_PORT=5432
-```
-
-### 4. Database Migrations
-```bash
-python manage.py makemigrations
+# 5. Database setup
 python manage.py migrate
 python manage.py createsuperuser
-```
 
-### 5. Static Files
-```bash
+# 6. Collectstatic
 python manage.py collectstatic --noinput
-```
 
-### 6. Run Server
-```bash
+# 7. Run server
 python manage.py runserver 0.0.0.0:8000
 ```
 
-</details>
+**Accedi su:** http://localhost:8000
 
 ---
 
-## ⚙️ Configurazione
+## 🔌 API SSO
 
-### Variabili Ambiente (.env)
-```env
-# Ambiente
-DEBUG=False
-SECRET_KEY=your-secret-key-min-50-chars
-ALLOWED_HOSTS=yourdomain.com,www.yourdomain.com
+### Endpoints
 
-# Database
-DB_NAME=myapp_db
-DB_USER=myapp_user
-DB_PASS=strong_password_here
-DB_HOST=localhost
-DB_PORT=5432
-
-# Email (opzionale)
-EMAIL_HOST=smtp.gmail.com
-EMAIL_PORT=587
-EMAIL_USE_TLS=True
-EMAIL_HOST_USER=your-email@gmail.com
-EMAIL_HOST_PASSWORD=your-app-password
-
-# Redis (opzionale per Celery)
-REDIS_URL=redis://localhost:6379/0
+#### 1. Info API
+```http
+GET /api/sso/
 ```
 
-### Impostazioni Personalizzate
-
-Vedi `myproject/settings.py` per configurazioni avanzate:
-- CORS origins
-- Rate limiting
-- File upload limits
-- Session timeout
-- Security headers
+**Response:**
+```json
+{
+  "name": "MyApp SSO API",
+  "version": "1.0",
+  "endpoints": { ... }
+}
+```
 
 ---
 
-## 🌐 Deploy Produzione
+#### 2. Login (Genera Token)
+```http
+POST /api/sso/login/
+Content-Type: application/json
 
-### Metodo 1: Script Automatico (Raccomandato)
-```bash
-# Sul server di produzione
-git clone https://github.com/username/[NOME_REPO].git
-cd [NOME_REPO]
-
-chmod +x scripts/deploy.sh
-sudo ./scripts/deploy.sh
+{
+  "username": "admin",
+  "password": "your_password"
+}
 ```
 
-Lo script `deploy.sh` configura:
-- ✅ PostgreSQL database
-- ✅ Virtual environment
-- ✅ Gunicorn systemd service
-- ✅ Nginx reverse proxy
-- ✅ SSL con Let's Encrypt
-- ✅ Firewall UFW
-- ✅ Permessi file corretti
-
-### Metodo 2: Deploy Manuale
-
-<details>
-<summary>Procedura completa passo-passo</summary>
-
-#### 1. Preparazione Server
-```bash
-# Update sistema
-sudo apt update && sudo apt upgrade -y
-
-# Installa dipendenze
-sudo apt install -y python3.12 python3.12-venv python3-pip
-sudo apt install -y postgresql postgresql-contrib
-sudo apt install -y nginx
-sudo apt install -y git
+**Response:**
+```json
+{
+  "access": "eyJ0eXAiOiJKV1QiLCJhbGc...",
+  "refresh": "eyJ0eXAiOiJKV1QiLCJhbGc...",
+  "user": {
+    "id": 1,
+    "username": "admin",
+    "profile": {
+      "role": "admin",
+      "role_display": "Amministratore"
+    }
+  }
+}
 ```
 
-#### 2. Clone Progetto
+---
+
+#### 3. Valida Token
+```http
+POST /api/sso/validate/
+Content-Type: application/json
+
+{
+  "token": "eyJ0eXAiOiJKV1QiLCJhbGc..."
+}
+```
+
+**Response:**
+```json
+{
+  "valid": true,
+  "user": { ... }
+}
+```
+
+---
+
+#### 4. Current User
+```http
+GET /api/sso/me/
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGc...
+```
+
+**Response:**
+```json
+{
+  "id": 1,
+  "username": "admin",
+  "email": "admin@example.com",
+  "profile": { ... }
+}
+```
+
+---
+
+### Esempi Integrazione
+
+#### JavaScript (Fetch)
+```javascript
+// Login
+const response = await fetch('http://your-domain.com/api/sso/login/', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ username: 'admin', password: 'pass' })
+});
+
+const data = await response.json();
+const accessToken = data.access;
+
+// Usa token per API calls
+const userResponse = await fetch('http://your-domain.com/api/sso/me/', {
+  headers: { 'Authorization': `Bearer ${accessToken}` }
+});
+```
+
+#### Python (Requests)
+```python
+import requests
+
+# Login
+response = requests.post('http://your-domain.com/api/sso/login/', json={
+    'username': 'admin',
+    'password': 'pass'
+})
+
+data = response.json()
+access_token = data['access']
+
+# Usa token
+headers = {'Authorization': f'Bearer {access_token}'}
+user_response = requests.get('http://your-domain.com/api/sso/me/', headers=headers)
+```
+
+#### cURL
 ```bash
-sudo mkdir -p /opt/myapp
-sudo chown $USER:$USER /opt/myapp
+# Login
+curl -X POST http://your-domain.com/api/sso/login/ \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"pass"}'
+
+# Get user info
+curl http://your-domain.com/api/sso/me/ \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE"
+```
+
+**Documentazione completa:** [API_SSO_DOCUMENTATION.md](API_SSO_DOCUMENTATION.md)
+
+---
+
+## 🌐 Deployment
+
+### Produzione con Gunicorn + Nginx
+
+Segui la guida completa: **[DEPLOY_GUIDE.md](DEPLOY_GUIDE.md)**
+
+**Quick steps:**
+```bash
+# 1. Clone su server
+git clone https://github.com/turiliffiu/myapp.git /opt/myapp
 cd /opt/myapp
 
-git clone https://github.com/username/[NOME_REPO].git .
-```
-
-#### 3. Virtual Environment
-```bash
-python3.12 -m venv venv
+# 2. Setup environment
+python3 -m venv venv
 source venv/bin/activate
-pip install --upgrade pip
 pip install -r requirements.txt
-pip install gunicorn
-```
 
-#### 4. Database Setup
-```bash
-sudo -u postgres psql << 'EOSQL'
-CREATE DATABASE myapp_db;
-CREATE USER myapp_user WITH PASSWORD 'production_strong_password';
-GRANT ALL PRIVILEGES ON DATABASE myapp_db TO myapp_user;
-\q
-EOSQL
-```
-
-#### 5. Configurazione .env
-```bash
+# 3. Configure .env (DEBUG=False, PostgreSQL)
 cp .env.example .env
 nano .env
-```
 
-**Importante:** Imposta `DEBUG=False` e configura correttamente:
-- SECRET_KEY (genera nuovo)
-- ALLOWED_HOSTS (dominio reale)
-- Database credentials
-- Email settings
-
-#### 6. Django Setup
-```bash
-python manage.py makemigrations
+# 4. Database
 python manage.py migrate
-python manage.py collectstatic --noinput
 python manage.py createsuperuser
-```
+python manage.py collectstatic --noinput
 
-#### 7. Gunicorn Service
-```bash
-sudo tee /etc/systemd/system/myapp.service << 'EOSERVICE'
-[Unit]
-Description=Gunicorn MyApp
-After=network.target postgresql.service
-
-[Service]
-User=www-data
-Group=www-data
-WorkingDirectory=/opt/myapp
-Environment="PATH=/opt/myapp/venv/bin"
-ExecStart=/opt/myapp/venv/bin/gunicorn \
-    --workers 3 \
-    --bind unix:/opt/myapp/gunicorn.sock \
-    --access-logfile /var/log/myapp/access.log \
-    --error-logfile /var/log/myapp/error.log \
-    --timeout 30 \
-    myproject.wsgi:application
-
-Restart=on-failure
-RestartSec=5s
-
-[Install]
-WantedBy=multi-user.target
-EOSERVICE
-
-# Crea directory log
-sudo mkdir -p /var/log/myapp
-sudo chown www-data:www-data /var/log/myapp
-
-# Avvia servizio
-sudo systemctl daemon-reload
-sudo systemctl start myapp
+# 5. Gunicorn service
+sudo cp deploy/gunicorn.service /etc/systemd/system/myapp.service
 sudo systemctl enable myapp
-sudo systemctl status myapp
-```
+sudo systemctl start myapp
 
-#### 8. Nginx Configuration
-```bash
-sudo tee /etc/nginx/sites-available/myapp << 'EONGINX'
-server {
-    listen 80;
-    server_name yourdomain.com www.yourdomain.com;
-    client_max_body_size 10M;
-
-    location /static/ {
-        alias /opt/myapp/staticfiles/;
-        expires 30d;
-        add_header Cache-Control "public, immutable";
-    }
-
-    location /media/ {
-        alias /opt/myapp/media/;
-        expires 7d;
-    }
-
-    location / {
-        proxy_pass http://unix:/opt/myapp/gunicorn.sock;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_connect_timeout 30;
-        proxy_read_timeout 30;
-    }
-
-    access_log /var/log/nginx/myapp_access.log;
-    error_log /var/log/nginx/myapp_error.log;
-}
-EONGINX
-
-# Attiva sito
+# 6. Nginx
+sudo cp deploy/nginx.conf /etc/nginx/sites-available/myapp
 sudo ln -s /etc/nginx/sites-available/myapp /etc/nginx/sites-enabled/
-sudo rm -f /etc/nginx/sites-enabled/default
-sudo nginx -t
 sudo systemctl restart nginx
 ```
-
-#### 9. SSL Certificate (Let's Encrypt)
-```bash
-sudo apt install -y certbot python3-certbot-nginx
-sudo certbot --nginx -d yourdomain.com -d www.yourdomain.com
-```
-
-#### 10. Permessi Finali
-```bash
-sudo chown -R www-data:www-data /opt/myapp
-sudo chmod -R 755 /opt/myapp
-sudo chmod -R 775 /opt/myapp/media
-```
-
-#### 11. Firewall
-```bash
-sudo ufw allow 'Nginx Full'
-sudo ufw allow OpenSSH
-sudo ufw enable
-```
-
-</details>
 
 ---
 
 ## 📖 Utilizzo
 
-### Dashboard
+### Creare Nuova App
 
-Dopo login, accedi alla dashboard principale:
-```
-http://yourdomain.com/dashboard/
-```
+**1. Accedi all'admin:** http://your-domain.com/admin/
 
-### Admin Panel
+**2. Vai su:** Apphub → Apps → Add App
 
-Accesso admin Django:
-```
-http://yourdomain.com/admin/
-```
+**3. Compila:**
+- **Nome**: Nome visualizzato
+- **Slug**: URL-friendly (es: my-app)
+- **Descrizione**: Breve descrizione
+- **Icona**: Emoji (es: 🚀)
+- **Tipo**: Internal URL / External URL / HTML Page / iFrame
+- **URL o HTML Content**: Dipende dal tipo
+- **Gradienti**: Color From (#667eea) e Color To (#764ba2)
+- **Permessi**: Ruoli consentiti
 
-Credenziali: superuser creato durante setup
+**4. Salva**
 
-### API Documentation
-
-Browsable API:
-```
-http://yourdomain.com/api/
-```
+L'app appare subito nella homepage!
 
 ---
 
-## 🔌 API
+### Integrare SSO in App Esterna
 
-### Authentication
-```bash
-# Login
-POST /api/auth/login/
-{
-    "username": "user",
-    "password": "pass"
+**1. Login e ottieni token:**
+```javascript
+const response = await fetch('/api/sso/login/', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ username, password })
+});
+
+const { access, refresh } = await response.json();
+localStorage.setItem('access_token', access);
+```
+
+**2. Usa token per chiamate API:**
+```javascript
+const apiCall = await fetch('/api/your-endpoint/', {
+  headers: { 'Authorization': `Bearer ${access}` }
+});
+```
+
+**3. Valida token periodicamente:**
+```javascript
+const validate = await fetch('/api/sso/validate/', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ token: access })
+});
+
+const { valid } = await validate.json();
+if (!valid) {
+  // Refresh o re-login
 }
-
-# Response
-{
-    "token": "jwt_token_here",
-    "user": {
-        "id": 1,
-        "username": "user",
-        "email": "user@example.com"
-    }
-}
-```
-
-### Endpoints Principali
-```
-GET    /api/users/           # Lista utenti (admin)
-GET    /api/users/{id}/      # Dettaglio utente
-PATCH  /api/users/{id}/role/ # Cambia ruolo (admin)
-
-# Aggiungi qui gli endpoint specifici del tuo progetto
-```
-
-**Documentazione completa:** Vedi `/api/docs/` (se abilitato)
-
----
-
-## 📁 Struttura Progetto
-```
-myproject/
-├── apps/
-│   ├── core/              # App principale: auth, dashboard
-│   │   ├── models.py      # UserProfile con ruoli
-│   │   ├── views.py       # Login, register, dashboard
-│   │   ├── forms.py       # Form con Tailwind styling
-│   │   ├── decorators.py  # role_required()
-│   │   ├── signals.py     # Auto-crea UserProfile
-│   │   └── templates/
-│   │       └── core/
-│   │           ├── base.html
-│   │           ├── login.html
-│   │           └── dashboard.html
-│   │
-│   ├── api/               # REST API layer
-│   │   ├── serializers.py
-│   │   ├── views.py
-│   │   ├── permissions.py
-│   │   └── urls.py
-│   │
-│   └── [domain_app]/      # App del dominio (esempio)
-│       ├── models.py
-│       ├── views.py
-│       ├── urls.py
-│       └── templates/
-│
-├── myproject/             # Configurazione Django
-│   ├── settings.py
-│   ├── urls.py
-│   └── wsgi.py
-│
-├── static/                # Static files del progetto
-├── media/                 # User uploads
-├── templates/             # Template globali (404, 500)
-│
-├── scripts/               # Script utility
-│   ├── setup.sh          # Setup automatico development
-│   └── deploy.sh         # Deploy automatico production
-│
-├── requirements.txt
-├── .env.example
-├── .gitignore
-├── manage.py
-└── README.md
 ```
 
 ---
 
-## 💻 Development
+## 🚧 Roadmap
 
-### Setup Development Environment
-```bash
-# Clone e setup
-git clone https://github.com/username/[NOME_REPO].git
-cd [NOME_REPO]
-./scripts/setup.sh
+### v1.1 (In Sviluppo)
+- [ ] User registration con email verification
+- [ ] Password reset flow
+- [ ] OAuth2 integration (Google, GitHub)
+- [ ] Multi-language support (i18n)
 
-# Attiva virtual environment
-source venv/bin/activate
+### v1.2 (Futuro)
+- [ ] App analytics e statistiche utilizzo
+- [ ] Dark theme toggle
+- [ ] Search e filtri avanzati
+- [ ] Notifications system
+- [ ] Mobile app (React Native)
 
-# Run development server
-python manage.py runserver
-```
-
-### Workflow Git
-```bash
-# Crea feature branch
-git checkout -b feature/nuova-feature
-
-# Sviluppa, commit, push
-git add .
-git commit -m "feat: descrizione feature"
-git push origin feature/nuova-feature
-
-# Crea Pull Request su GitHub
-```
-
-### Database Management
-```bash
-# Nuova migration
-python manage.py makemigrations
-
-# Applica migrations
-python manage.py migrate
-
-# Shell Django
-python manage.py shell
-
-# Database shell
-python manage.py dbshell
-```
-
-### Seed Data (Opzionale)
-```bash
-# Crea utenti di esempio
-python manage.py seed_db
-```
-
----
-
-## 🧪 Testing
-
-### Run Tests
-```bash
-# Tutti i test
-pytest
-
-# Test specifici
-pytest apps/core/tests/
-pytest apps/core/tests/test_auth.py
-
-# Con coverage
-pytest --cov=apps --cov-report=html
-```
-
-### Struttura Test
-```python
-# apps/core/tests/test_auth.py
-import pytest
-from django.test import Client
-
-@pytest.mark.django_db
-def test_login_success():
-    client = Client()
-    response = client.post('/login/', {
-        'username': 'testuser',
-        'password': 'testpass'
-    })
-    assert response.status_code == 302
-```
-
----
-
-## 🐛 Troubleshooting
-
-### Gunicorn Non Parte
-```bash
-# Check status
-sudo systemctl status myapp
-
-# Logs
-sudo journalctl -u myapp -n 50
-
-# Restart
-sudo systemctl restart myapp
-```
-
-### 502 Bad Gateway
-```bash
-# Verifica socket
-ls -la /opt/myapp/gunicorn.sock
-
-# Permessi
-sudo chown www-data:www-data /opt/myapp/gunicorn.sock
-
-# Nginx logs
-sudo tail -f /var/log/nginx/error.log
-```
-
-### Database Connection Error
-```bash
-# Verifica PostgreSQL
-sudo systemctl status postgresql
-
-# Test connessione
-psql -U myapp_user -d myapp_db -h localhost
-
-# Check .env
-cat .env | grep DB_
-```
-
-### Static Files Non Serviti
-```bash
-# Collectstatic
-python manage.py collectstatic --clear --noinput
-
-# Permessi
-sudo chown -R www-data:www-data staticfiles/
-sudo chmod -R 755 staticfiles/
-```
+### v2.0 (Long-term)
+- [ ] Multi-tenancy support
+- [ ] Advanced RBAC con custom permissions
+- [ ] API rate limiting
+- [ ] Audit logs
+- [ ] Team collaboration features
 
 ---
 
 ## 🤝 Contributi
 
-I contributi sono benvenuti! Per contribuire:
+Contributi benvenuti! Per contribuire:
 
 1. Fork il progetto
-2. Crea feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit modifiche (`git commit -m 'feat: Add AmazingFeature'`)
+2. Crea branch feature (`git checkout -b feature/AmazingFeature`)
+3. Commit modifiche (`git commit -m 'Add AmazingFeature'`)
 4. Push al branch (`git push origin feature/AmazingFeature`)
 5. Apri Pull Request
-
-### Convenzioni Commit
-
-Usa [Conventional Commits](https://www.conventionalcommits.org/):
-```
-feat: nuova feature
-fix: correzione bug
-docs: documentazione
-style: formattazione
-refactor: refactoring codice
-test: aggiunta test
-chore: manutenzione
-```
 
 ---
 
 ## 📝 Changelog
 
-### v1.0.0 (2026-02-01)
-- ✅ Release iniziale
-- ✅ Sistema autenticazione completo
-- ✅ API REST con DRF
-- ✅ Deploy automatico
-- ✅ Documentazione completa
-
----
-
-## 👨‍💻 Autore
-
-**[TUO NOME]**
-- GitHub: [@username](https://github.com/username)
-- Email: your.email@example.com
+### v1.0.0 (2026-02-03)
+- ✅ Initial release
+- ✅ Application Hub con 4 tipi di app
+- ✅ SSO API con JWT authentication
+- ✅ Admin interface completa
+- ✅ App demo: Calcolatrice, SSO Dashboard
+- ✅ Deploy guide per produzione
+- ✅ API documentation completa
 
 ---
 
 ## 📄 Licenza
 
-Questo progetto è rilasciato sotto licenza **MIT**. Vedi [LICENSE](LICENSE) per dettagli.
+MIT License - vedi [LICENSE](LICENSE)
 
 ---
 
-## 🌟 Ringraziamenti
+## 👨‍💻 Autore
+
+**Salvatore Teodoro**
+- GitHub: [@turiliffiu](https://github.com/turiliffiu)
+- Repository: [github.com/turiliffiu/myapp](https://github.com/turiliffiu/myapp)
+
+---
+
+## 🙏 Credits
 
 - Django Team
 - Django REST Framework
+- Bootstrap Team
 - Tailwind CSS
-- Alpine.js
-- Community Open Source
+- JWT.io
 
 ---
 
 <div align="center">
 
-**Fatto con ❤️ in Italia**
+**Fatto con ❤️ usando Django + JWT**
 
 ⭐ Se ti piace questo progetto, lascia una stella su GitHub! ⭐
 
-[⬆ Torna su](#-nome-progetto)
+[⬆ Torna su](#-myapp---application-hub-with-sso)
 
 </div>
