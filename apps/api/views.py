@@ -1,56 +1,185 @@
-from rest_framework import viewsets, status
-from rest_framework.decorators import action
+from rest_framework import status, viewsets
+from rest_framework.decorators import api_view, permission_classes, action
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
+from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 
-from apps.core.models import UserProfile
-from .serializers import UserSerializer
-from .permissions import IsAdmin
+from .serializers import (
+    UserSerializer, 
+    UserProfileSerializer, 
+    TokenValidationSerializer,
+    SSOLoginSerializer
+)
 
 
-class UserViewSet(viewsets.ModelViewSet):
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def sso_login(request):
     """
-    API gestione utenti - solo Admin.
+    Login SSO - Genera JWT tokens.
     
-    Endpoint:
-        GET    /api/users/          → lista
-        GET    /api/users/{id}/     → dettaglio
-        PATCH  /api/users/{id}/     → modifica
-        DELETE /api/users/{id}/     → elimina
-        PATCH  /api/users/{id}/role/   → cambia ruolo
-        PATCH  /api/users/{id}/active/ → attiva/disattiva
+    POST /api/sso/login/
+    Body: {"username": "admin", "password": "xxx"}
+    
+    Returns: {
+        "access": "token...",
+        "refresh": "token...",
+        "user": {...}
+    }
     """
-    serializer_class = UserSerializer
-    permission_classes = [IsAdmin]
-    queryset = User.objects.select_related('profile').order_by('-date_joined')
+    serializer = SSOLoginSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    
+    username = serializer.validated_data['username']
+    password = serializer.validated_data['password']
+    
+    user = authenticate(username=username, password=password)
+    
+    if user is None:
+        return Response(
+            {'error': 'Credenziali non valide'},
+            status=status.HTTP_401_UNAUTHORIZED
+        )
+    
+    if not user.is_active:
+        return Response(
+            {'error': 'Account disabilitato'},
+            status=status.HTTP_403_FORBIDDEN
+        )
+    
+    # Genera JWT tokens
+    refresh = RefreshToken.for_user(user)
+    
+    # Serializza user info
+    user_data = UserSerializer(user).data
+    
+    return Response({
+        'access': str(refresh.access_token),
+        'refresh': str(refresh),
+        'user': user_data
+    })
 
-    @action(detail=True, methods=['patch'], url_path='role')
-    def change_role(self, request, pk=None):
-        user = self.get_object()
-        role = request.data.get('role')
 
-        if role not in ('admin', 'editor', 'viewer'):
-            return Response({'error': 'Ruolo non valido'}, status=status.HTTP_400_BAD_REQUEST)
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def validate_token(request):
+    """
+    Valida un JWT token e restituisce info utente.
+    
+    POST /api/sso/validate/
+    Body: {"token": "xxx"}
+    
+    Returns: {
+        "valid": true,
+        "user": {...}
+    }
+    """
+    serializer = TokenValidationSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    
+    token_string = serializer.validated_data['token']
+    
+    try:
+        # Decodifica token
+        from rest_framework_simplejwt.tokens import AccessToken
+        token = AccessToken(token_string)
+        
+        # Ottieni user
+        user_id = token['user_id']
+        user = User.objects.get(id=user_id)
+        
+        if not user.is_active:
+            return Response(
+                {'valid': False, 'error': 'Account disabilitato'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        # Serializza user
+        user_data = UserSerializer(user).data
+        
+        return Response({
+            'valid': True,
+            'user': user_data
+        })
+        
+    except (InvalidToken, TokenError) as e:
+        return Response(
+            {'valid': False, 'error': str(e)},
+            status=status.HTTP_401_UNAUTHORIZED
+        )
+    except User.DoesNotExist:
+        return Response(
+            {'valid': False, 'error': 'Utente non trovato'},
+            status=status.HTTP_404_NOT_FOUND
+        )
 
-        # Previene rimozione ultimo admin
-        if user.profile.role == 'admin' and role != 'admin':
-            if UserProfile.objects.filter(role='admin').count() <= 1:
-                return Response(
-                    {'error': 'Impossibile: ultimo amministratore'},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
 
-        user.profile.role = role
-        user.profile.save()
-        return Response({'message': 'Ruolo aggiornato', 'role': role})
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def refresh_token(request):
+    """
+    Refresh JWT token.
+    
+    POST /api/sso/refresh/
+    Headers: Authorization: Bearer <access_token>
+    Body: {"refresh": "refresh_token"}
+    
+    Returns: {"access": "new_token"}
+    """
+    refresh_token = request.data.get('refresh')
+    
+    if not refresh_token:
+        return Response(
+            {'error': 'Refresh token richiesto'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try:
+        refresh = RefreshToken(refresh_token)
+        return Response({
+            'access': str(refresh.access_token)
+        })
+    except (InvalidToken, TokenError) as e:
+        return Response(
+            {'error': str(e)},
+            status=status.HTTP_401_UNAUTHORIZED
+        )
 
-    @action(detail=True, methods=['patch'], url_path='active')
-    def toggle_active(self, request, pk=None):
-        user = self.get_object()
-        active = request.data.get('active')
-        if active is None:
-            return Response({'error': 'Campo "active" mancante'}, status=status.HTTP_400_BAD_REQUEST)
 
-        user.is_active = bool(active)
-        user.save()
-        return Response({'message': 'Stato aggiornato', 'is_active': user.is_active})
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def current_user(request):
+    """
+    Ottieni info utente corrente autenticato.
+    
+    GET /api/sso/me/
+    Headers: Authorization: Bearer <token>
+    
+    Returns: user data
+    """
+    serializer = UserSerializer(request.user)
+    return Response(serializer.data)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def sso_info(request):
+    """
+    Informazioni su API SSO disponibili.
+    
+    GET /api/sso/
+    """
+    return Response({
+        'name': 'MyApp SSO API',
+        'version': '1.0',
+        'endpoints': {
+            'login': '/api/sso/login/',
+            'validate': '/api/sso/validate/',
+            'refresh': '/api/sso/refresh/',
+            'me': '/api/sso/me/',
+        },
+        'documentation': 'https://github.com/turiliffiu/myapp'
+    })

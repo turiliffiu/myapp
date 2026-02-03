@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSO Dashboard Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-indigo-50 to-blue-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
+        <!-- Header -->
+        <div class="bg-white rounded-2xl shadow-2xl overflow-hidden mb-6">
+            <div class="bg-gradient-to-r from-indigo-600 to-blue-600 p-6 text-white">
+                <h1 class="text-3xl font-bold mb-2">🔐 SSO Dashboard Demo</h1>
+                <p class="text-white/80">Esempio integrazione MyApp SSO API</p>
+            </div>
+            
+            <!-- User Info -->
+            <div id="userInfo" class="p-6 bg-gray-50 border-b hidden">
+                <div class="flex items-center gap-4">
+                    <div class="h-16 w-16 bg-indigo-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
+                        <span id="userInitial">?</span>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-800" id="userName">Loading...</h3>
+                        <p class="text-sm text-gray-600">
+                            <span id="userRole" class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium"></span>
+                        </p>
+                    </div>
+                    <button onclick="logout()" class="ml-auto px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition">
+                        Logout
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Login Form -->
+            <div id="loginForm" class="p-8">
+                <h2 class="text-xl font-bold text-gray-800 mb-6">Login con MyApp SSO</h2>
+                <form onsubmit="handleLogin(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Username</label>
+                        <input type="text" id="username" required
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                               placeholder="admin">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                        <input type="password" id="password" required
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                               placeholder="••••••••">
+                    </div>
+                    <button type="submit" 
+                            class="w-full py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition">
+                        Login
+                    </button>
+                </form>
+                <div id="loginError" class="mt-4 hidden p-3 bg-red-50 border border-red-200 rounded-lg text-red-800 text-sm"></div>
+            </div>
+        </div>
+
+        <!-- API Info Cards -->
+        <div id="apiInfo" class="hidden grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Token Info -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h3 class="text-lg font-bold text-gray-800 mb-4">🎫 Access Token</h3>
+                <div class="bg-gray-50 rounded-lg p-4 mb-4 overflow-auto">
+                    <code id="accessToken" class="text-xs text-gray-600 break-all"></code>
+                </div>
+                <button onclick="copyToken('access')" 
+                        class="text-sm text-indigo-600 hover:text-indigo-800 font-medium">
+                    📋 Copia Token
+                </button>
+            </div>
+
+            <!-- API Call Example -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h3 class="text-lg font-bold text-gray-800 mb-4">🔄 Test API</h3>
+                <button onclick="testAPI()" 
+                        class="w-full mb-4 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition">
+                    Test GET /api/sso/me/
+                </button>
+                <div id="apiResponse" class="bg-gray-50 rounded-lg p-4 overflow-auto max-h-48 hidden">
+                    <pre id="apiResponseText" class="text-xs text-gray-600"></pre>
+                </div>
+            </div>
+
+            <!-- User Details -->
+            <div class="bg-white rounded-xl shadow-lg p-6 md:col-span-2">
+                <h3 class="text-lg font-bold text-gray-800 mb-4">👤 User Details</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="userDetails"></div>
+            </div>
+        </div>
+
+        <!-- Documentation -->
+        <div class="mt-6 bg-white rounded-xl shadow-lg p-6">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">📚 Come Funziona</h3>
+            <div class="space-y-3 text-sm text-gray-600">
+                <p><strong>1. Login:</strong> POST /api/sso/login/ con username e password</p>
+                <p><strong>2. Ricevi Token:</strong> Access token (1h) e Refresh token (7 giorni)</p>
+                <p><strong>3. Usa Token:</strong> Header "Authorization: Bearer TOKEN" nelle chiamate API</p>
+                <p><strong>4. Valida Token:</strong> POST /api/sso/validate/ per verificare validità</p>
+            </div>
+            <a href="/api/sso/" target="_blank" 
+               class="mt-4 inline-block text-indigo-600 hover:text-indigo-800 font-medium text-sm">
+                📖 Vedi documentazione API completa →
+            </a>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = window.location.origin;
+        let tokens = {
+            access: null,
+            refresh: null
+        };
+
+        // Check if already logged in
+        window.addEventListener('DOMContentLoaded', () => {
+            const storedAccess = localStorage.getItem('myapp_access_token');
+            if (storedAccess) {
+                validateAndLoadUser(storedAccess);
+            }
+        });
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/sso/login/`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    tokens.access = data.access;
+                    tokens.refresh = data.refresh;
+                    
+                    // Store in localStorage
+                    localStorage.setItem('myapp_access_token', data.access);
+                    localStorage.setItem('myapp_refresh_token', data.refresh);
+                    
+                    showUserDashboard(data.user);
+                    hideLoginError();
+                } else {
+                    showLoginError(data.error || 'Login fallito');
+                }
+            } catch (error) {
+                showLoginError('Errore di connessione: ' + error.message);
+            }
+        }
+
+        async function validateAndLoadUser(token) {
+            try {
+                const response = await fetch(`${API_BASE}/api/sso/validate/`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token })
+                });
+                
+                const data = await response.json();
+                
+                if (data.valid) {
+                    tokens.access = token;
+                    tokens.refresh = localStorage.getItem('myapp_refresh_token');
+                    showUserDashboard(data.user);
+                } else {
+                    logout();
+                }
+            } catch (error) {
+                logout();
+            }
+        }
+
+        function showUserDashboard(user) {
+            // Hide login form
+            document.getElementById('loginForm').classList.add('hidden');
+            
+            // Show user info
+            const userInfo = document.getElementById('userInfo');
+            userInfo.classList.remove('hidden');
+            document.getElementById('userInitial').textContent = user.username.charAt(0).toUpperCase();
+            document.getElementById('userName').textContent = user.username;
+            document.getElementById('userRole').textContent = user.profile.role_display;
+            
+            // Show API info
+            document.getElementById('apiInfo').classList.remove('hidden');
+            document.getElementById('accessToken').textContent = tokens.access;
+            
+            // Show user details
+            const details = document.getElementById('userDetails');
+            details.innerHTML = `
+                <div><span class="text-gray-500 text-xs">ID</span><p class="font-semibold">${user.id}</p></div>
+                <div><span class="text-gray-500 text-xs">Username</span><p class="font-semibold">${user.username}</p></div>
+                <div><span class="text-gray-500 text-xs">Email</span><p class="font-semibold">${user.email || 'N/A'}</p></div>
+                <div><span class="text-gray-500 text-xs">Ruolo</span><p class="font-semibold">${user.profile.role_display}</p></div>
+            `;
+        }
+
+        async function testAPI() {
+            try {
+                const response = await fetch(`${API_BASE}/api/sso/me/`, {
+                    headers: { 'Authorization': `Bearer ${tokens.access}` }
+                });
+                
+                const data = await response.json();
+                
+                const apiResponse = document.getElementById('apiResponse');
+                apiResponse.classList.remove('hidden');
+                document.getElementById('apiResponseText').textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                alert('Errore: ' + error.message);
+            }
+        }
+
+        function copyToken(type) {
+            const token = type === 'access' ? tokens.access : tokens.refresh;
+            navigator.clipboard.writeText(token);
+            alert('Token copiato negli appunti!');
+        }
+
+        function logout() {
+            localStorage.removeItem('myapp_access_token');
+            localStorage.removeItem('myapp_refresh_token');
+            tokens = { access: null, refresh: null };
+            
+            document.getElementById('loginForm').classList.remove('hidden');
+            document.getElementById('userInfo').classList.add('hidden');
+            document.getElementById('apiInfo').classList.add('hidden');
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+        }
+
+        function showLoginError(message) {
+            const errorDiv = document.getElementById('loginError');
+            errorDiv.textContent = message;
+            errorDiv.classList.remove('hidden');
+        }
+
+        function hideLoginError() {
+            document.getElementById('loginError').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
