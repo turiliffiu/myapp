@@ -220,8 +220,23 @@
 
         function copyToken(type) {
             const token = type === 'access' ? tokens.access : tokens.refresh;
-            navigator.clipboard.writeText(token);
-            alert('Token copiato negli appunti!');
+            
+            // Fallback per HTTP (non-secure context)
+            const textarea = document.createElement('textarea');
+            textarea.value = token;
+            textarea.style.position = 'fixed';
+            textarea.style.left = '-999999px';
+            document.body.appendChild(textarea);
+            textarea.select();
+            
+            try {
+                document.execCommand('copy');
+                alert('Token copiato negli appunti!');
+            } catch (err) {
+                alert('Impossibile copiare il token');
+            }
+            
+            document.body.removeChild(textarea);
         }
 
         function logout() {

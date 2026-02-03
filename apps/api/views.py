@@ -1,176 +1,27 @@
-from rest_framework import status, viewsets
-from rest_framework.decorators import api_view, permission_classes, action
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+import jwt
+from django.conf import settings
 
 from .serializers import (
-    UserSerializer, 
-    UserProfileSerializer, 
+    UserSerializer,
     TokenValidationSerializer,
     SSOLoginSerializer
 )
-
-
-@api_view(['POST'])
-@permission_classes([AllowAny])
-def sso_login(request):
-    """
-    Login SSO - Genera JWT tokens.
-    
-    POST /api/sso/login/
-    Body: {"username": "admin", "password": "xxx"}
-    
-    Returns: {
-        "access": "token...",
-        "refresh": "token...",
-        "user": {...}
-    }
-    """
-    serializer = SSOLoginSerializer(data=request.data)
-    serializer.is_valid(raise_exception=True)
-    
-    username = serializer.validated_data['username']
-    password = serializer.validated_data['password']
-    
-    user = authenticate(username=username, password=password)
-    
-    if user is None:
-        return Response(
-            {'error': 'Credenziali non valide'},
-            status=status.HTTP_401_UNAUTHORIZED
-        )
-    
-    if not user.is_active:
-        return Response(
-            {'error': 'Account disabilitato'},
-            status=status.HTTP_403_FORBIDDEN
-        )
-    
-    # Genera JWT tokens
-    refresh = RefreshToken.for_user(user)
-    
-    # Serializza user info
-    user_data = UserSerializer(user).data
-    
-    return Response({
-        'access': str(refresh.access_token),
-        'refresh': str(refresh),
-        'user': user_data
-    })
-
-
-@api_view(['POST'])
-@permission_classes([AllowAny])
-def validate_token(request):
-    """
-    Valida un JWT token e restituisce info utente.
-    
-    POST /api/sso/validate/
-    Body: {"token": "xxx"}
-    
-    Returns: {
-        "valid": true,
-        "user": {...}
-    }
-    """
-    serializer = TokenValidationSerializer(data=request.data)
-    serializer.is_valid(raise_exception=True)
-    
-    token_string = serializer.validated_data['token']
-    
-    try:
-        # Decodifica token
-        from rest_framework_simplejwt.tokens import AccessToken
-        token = AccessToken(token_string)
-        
-        # Ottieni user
-        user_id = token['user_id']
-        user = User.objects.get(id=user_id)
-        
-        if not user.is_active:
-            return Response(
-                {'valid': False, 'error': 'Account disabilitato'},
-                status=status.HTTP_403_FORBIDDEN
-            )
-        
-        # Serializza user
-        user_data = UserSerializer(user).data
-        
-        return Response({
-            'valid': True,
-            'user': user_data
-        })
-        
-    except (InvalidToken, TokenError) as e:
-        return Response(
-            {'valid': False, 'error': str(e)},
-            status=status.HTTP_401_UNAUTHORIZED
-        )
-    except User.DoesNotExist:
-        return Response(
-            {'valid': False, 'error': 'Utente non trovato'},
-            status=status.HTTP_404_NOT_FOUND
-        )
-
-
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def refresh_token(request):
-    """
-    Refresh JWT token.
-    
-    POST /api/sso/refresh/
-    Headers: Authorization: Bearer <access_token>
-    Body: {"refresh": "refresh_token"}
-    
-    Returns: {"access": "new_token"}
-    """
-    refresh_token = request.data.get('refresh')
-    
-    if not refresh_token:
-        return Response(
-            {'error': 'Refresh token richiesto'},
-            status=status.HTTP_400_BAD_REQUEST
-        )
-    
-    try:
-        refresh = RefreshToken(refresh_token)
-        return Response({
-            'access': str(refresh.access_token)
-        })
-    except (InvalidToken, TokenError) as e:
-        return Response(
-            {'error': str(e)},
-            status=status.HTTP_401_UNAUTHORIZED
-        )
-
-
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def current_user(request):
-    """
-    Ottieni info utente corrente autenticato.
-    
-    GET /api/sso/me/
-    Headers: Authorization: Bearer <token>
-    
-    Returns: user data
-    """
-    serializer = UserSerializer(request.user)
-    return Response(serializer.data)
 
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def sso_info(request):
     """
-    Informazioni su API SSO disponibili.
-    
-    GET /api/sso/
+    Info sulla SSO API - Endpoint pubblico che descrive le API disponibili.
     """
     return Response({
         'name': 'MyApp SSO API',
@@ -179,7 +30,176 @@ def sso_info(request):
             'login': '/api/sso/login/',
             'validate': '/api/sso/validate/',
             'refresh': '/api/sso/refresh/',
-            'me': '/api/sso/me/',
+            'me': '/api/sso/me/'
         },
         'documentation': 'https://github.com/turiliffiu/myapp'
     })
+
+
+@csrf_exempt  # <-- AGGIUNTO
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def sso_login(request):
+    """
+    Login SSO - Genera JWT tokens per l'utente autenticato.
+    
+    Request Body:
+        {
+            "username": "admin",
+            "password": "password123"
+        }
+    
+    Response:
+        {
+            "access": "jwt_access_token",
+            "refresh": "jwt_refresh_token",
+            "user": { ... user data ... }
+        }
+    """
+    serializer = SSOLoginSerializer(data=request.data)
+    
+    if not serializer.is_valid():
+        return Response(
+            {'error': 'Invalid request data', 'details': serializer.errors},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    username = serializer.validated_data['username']
+    password = serializer.validated_data['password']
+    
+    # Autentica utente
+    user = authenticate(username=username, password=password)
+    
+    if user is None:
+        return Response(
+            {'error': 'Invalid credentials'},
+            status=status.HTTP_401_UNAUTHORIZED
+        )
+    
+    if not user.is_active:
+        return Response(
+            {'error': 'Account disabled'},
+            status=status.HTTP_403_FORBIDDEN
+        )
+    
+    # Genera JWT tokens
+    refresh = RefreshToken.for_user(user)
+    
+    return Response({
+        'access': str(refresh.access_token),
+        'refresh': str(refresh),
+        'user': UserSerializer(user).data
+    })
+
+
+@csrf_exempt  # <-- AGGIUNTO
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def validate_token(request):
+    """
+    Valida un JWT token e restituisce info utente se valido.
+    
+    Request Body:
+        {
+            "token": "jwt_token_here"
+        }
+    
+    Response:
+        {
+            "valid": true,
+            "user": { ... user data ... }
+        }
+    """
+    serializer = TokenValidationSerializer(data=request.data)
+    
+    if not serializer.is_valid():
+        return Response(
+            {'valid': False, 'error': 'Token required'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    token = serializer.validated_data['token']
+    
+    try:
+        # Decodifica JWT token
+        payload = jwt.decode(
+            token,
+            settings.SECRET_KEY,
+            algorithms=['HS256']
+        )
+        
+        # Recupera utente
+        user_id = payload.get('user_id')
+        user = User.objects.get(id=user_id)
+        
+        if not user.is_active:
+            return Response({
+                'valid': False,
+                'error': 'Account disabled'
+            })
+        
+        return Response({
+            'valid': True,
+            'user': UserSerializer(user).data
+        })
+        
+    except jwt.ExpiredSignatureError:
+        return Response({
+            'valid': False,
+            'error': 'Token expired'
+        })
+    except jwt.InvalidTokenError:
+        return Response({
+            'valid': False,
+            'error': 'Invalid token'
+        })
+    except User.DoesNotExist:
+        return Response({
+            'valid': False,
+            'error': 'User not found'
+        })
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def refresh_token(request):
+    """
+    Rigenera un nuovo access token usando il refresh token.
+    
+    Headers:
+        Authorization: Bearer <refresh_token>
+    
+    Response:
+        {
+            "access": "new_jwt_access_token"
+        }
+    """
+    try:
+        refresh = RefreshToken(request.data.get('refresh'))
+        return Response({
+            'access': str(refresh.access_token)
+        })
+    except Exception as e:
+        return Response(
+            {'error': 'Invalid refresh token'},
+            status=status.HTTP_401_UNAUTHORIZED
+        )
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def current_user(request):
+    """
+    Restituisce informazioni sull'utente correntemente autenticato.
+    
+    Headers:
+        Authorization: Bearer <access_token>
+    
+    Response:
+        {
+            "id": 1,
+            "username": "admin",
+            ...
+        }
+    """
+    return Response(UserSerializer(request.user).data)
