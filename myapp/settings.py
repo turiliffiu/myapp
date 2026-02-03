@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     # Project apps
     'apps.core',
     'apps.api',
+    'apps.apphub',
 ]
 
 MIDDLEWARE = [
@@ -54,7 +55,7 @@ MIDDLEWARE = [
     'apps.core.middleware.SecurityHeadersMiddleware',
 ]
 
-ROOT_URLCONF = 'myproject.urls'
+ROOT_URLCONF = 'myapp.urls'
 
 TEMPLATES = [
     {
@@ -72,7 +73,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'myproject.wsgi.application'
+WSGI_APPLICATION = 'myapp.wsgi.application'
 
 # Database - PostgreSQL
 # Database configuration - supporta sia PostgreSQL che SQLite

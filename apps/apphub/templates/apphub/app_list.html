@@ -1,0 +1,88 @@
+{% extends 'core/base.html' %}
+
+{% block title %}MyApp - Hub Applicazioni{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-800 mb-2">🚀 MyApp Hub</h1>
+    <p class="text-gray-600">
+        Accedi alle tue applicazioni - Totale: <span class="font-semibold">{{ total_apps }}</span> app disponibili
+    </p>
+</div>
+
+<!-- Grid Card App -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    {% for app in apps %}
+    <a href="{% url 'apphub:app_access' app.slug %}" 
+       class="block group">
+        <!-- Card con gradiente -->
+        <div class="relative rounded-xl shadow-lg overflow-hidden 
+                    transform transition-all duration-300 
+                    hover:-translate-y-2 hover:shadow-2xl
+                    bg-gradient-to-br"
+             style="background: linear-gradient(135deg, {{ app.color_from }} 0%, {{ app.color_to }} 100%);">
+            
+            <!-- Contenuto Card -->
+            <div class="p-6 text-white relative z-10">
+                <!-- Icona -->
+                <div class="text-5xl mb-4">{{ app.icon }}</div>
+                
+                <!-- Nome App -->
+                <h3 class="text-xl font-bold mb-2 line-clamp-1">
+                    {{ app.name }}
+                </h3>
+                
+                <!-- Descrizione -->
+                <p class="text-sm text-white/80 line-clamp-2 mb-4 min-h-[2.5rem]">
+                    {{ app.description|default:"Nessuna descrizione" }}
+                </p>
+            </div>
+            
+            <!-- Footer Card -->
+            <div class="bg-white/10 backdrop-blur-sm px-6 py-3 
+                        flex justify-between items-center text-white text-xs">
+                <span class="flex items-center gap-1">
+                    👁️ {{ app.click_count }} accessi
+                </span>
+                <span class="px-2 py-1 bg-white/20 rounded-full">
+                    {% if app.is_public %}
+                        🌐 Pubblico
+                    {% else %}
+                        🔒 Privato
+                    {% endif %}
+                </span>
+            </div>
+            
+            <!-- Overlay hover effect -->
+            <div class="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
+        </div>
+    </a>
+    {% empty %}
+    <!-- Empty State -->
+    <div class="col-span-full text-center py-16">
+        <div class="text-6xl mb-4">📱</div>
+        <p class="text-xl text-gray-600 mb-2">Nessuna app disponibile</p>
+        <p class="text-sm text-gray-500">
+            {% if user.is_authenticated %}
+                Contatta l'amministratore per aggiungere app.
+            {% else %}
+                Effettua il login per vedere le app disponibili.
+            {% endif %}
+        </p>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Info footer -->
+{% if user.is_authenticated and user.is_superuser %}
+<div class="mt-8 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+    <p class="text-sm text-blue-800">
+        👨‍💼 <strong>Admin:</strong> Gestisci le app da 
+        <a href="{% url 'admin:apphub_app_changelist' %}" class="underline hover:text-blue-600">
+            Django Admin
+        </a>
+    </p>
+</div>
+{% endif %}
+{% endblock %}

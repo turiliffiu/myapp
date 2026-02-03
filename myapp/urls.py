@@ -2,12 +2,11 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from django.views.generic import RedirectView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', RedirectView.as_view(url='/login/', permanent=False)),
-    path('', include('apps.core.urls')),
+    path('', include('apps.core.urls')),  # Login, dashboard core
+    path('apps/', include('apps.apphub.urls')),  # Apps hub
     path('api/', include('apps.api.urls')),
 ]
 
