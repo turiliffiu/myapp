@@ -52,6 +52,7 @@ PROJECT_DIR="/opt/$PROJECT_NAME"
 #DB_NAME="dashboard_db"
 #DB_USER="dashboard_user"
 DB_PASS=$(openssl rand -base64 32 | tr -d "=+/" | cut -c1-25)
+CONTAINER_IP=$(hostname -I | awk '{print $1}')
 
 
 print_info "Deploy di $PROJECT_NAME in $PROJECT_DIR"
@@ -165,7 +166,7 @@ print_info "Configurazione .env produzione..."
 # Richiedi dominio con loop
 DOMAIN=""
 while [ -z "$DOMAIN" ]; do
-    read -p "Dominio principale (es: example.com, 192.168.1.122): " DOMAIN
+    read -p "Dominio principale (es: example.com, $CONTAINER_IP): " DOMAIN
     if [ -z "$DOMAIN" ]; then
         print_error "Dominio obbligatorio! Premi Ctrl+C per uscire."
     fi
