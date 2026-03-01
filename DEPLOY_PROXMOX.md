@@ -35,7 +35,7 @@ Scarica file di installazione automatica (se si vuole anche da un altro terminal
 
 ```bash
 cd /root
-wget https://raw.github.com/turiliffiu/myfilehub/main/deploy_myfilehub.sh
+wget https://raw.github.com/turiliffiu/myapp/main/scripts/deploy.sh
 ```
 
 Esegui installazione automatica
