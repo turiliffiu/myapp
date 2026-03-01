@@ -83,7 +83,7 @@ fi
 
 # Se il progetto non è già clonato, chiedi URL repository
 if [ ! -f "$PROJECT_DIR/manage.py" ]; then
-    read -p "URL repository GitHub: " REPO_URL
+    #read -p "URL repository GitHub: " REPO_URL
     if [ -n "$REPO_URL" ]; then
         git clone $REPO_URL $PROJECT_DIR
         print_success "Repository clonato"
