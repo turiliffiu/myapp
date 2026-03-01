@@ -48,7 +48,7 @@ echo ""
 # ================================
 print_info "Installazione dipendenze sistema..."
 
-apt update
+apt update && apt upgrade -y
 apt install -y python${PYTHON_VERSION} python3-venv python3-pip
 apt install -y postgresql postgresql-contrib
 apt install -y nginx
