@@ -36,6 +36,7 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 # Variabili configurabili
+REPO_URL="https://github.com/turiliffiu/myapp.git"
 PROJECT_NAME="myapp"
 PROJECT_DIR="/opt/$PROJECT_NAME"
 PYTHON_VERSION="3.12"
