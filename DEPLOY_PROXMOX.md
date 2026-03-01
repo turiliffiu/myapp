@@ -41,8 +41,8 @@ wget https://raw.github.com/turiliffiu/myapp/main/scripts/deploy.sh
 Esegui installazione automatica
 
 ```bash
-chmod +x deploy_myfilehub.sh
-./deploy_myfilehub.sh
+chmod +x deploy.sh
+./deploy.sh
 ```
 
 Lo script eseguirà automaticamente:
