@@ -3,7 +3,7 @@
 # ================================
 # Django App - Deploy Automatico
 # ================================
-# Deploy completo su server Ubuntu 24.04:
+# Deploy completo su server Ubuntu 22.04/24.04:
 # - PostgreSQL database
 # - Gunicorn systemd service
 # - Nginx reverse proxy
@@ -35,13 +35,23 @@ if [ "$EUID" -ne 0 ]; then
     exit 1
 fi
 
+# Rileva versione Python disponibile
+if command -v python3.12 &> /dev/null; then
+    PYTHON_VERSION="3.12"
+elif command -v python3.10 &> /dev/null; then
+    PYTHON_VERSION="3.10"
+else
+    print_error "Nessuna versione di Python 3.10+ trovata!"
+    exit 1
+fi
+
 # Variabili configurabili
 REPO_URL="https://github.com/turiliffiu/myapp.git"
 PROJECT_NAME="myapp"
 PROJECT_DIR="/opt/$PROJECT_NAME"
-PYTHON_VERSION="3.12"
 
 print_info "Deploy di $PROJECT_NAME in $PROJECT_DIR"
+print_info "Usando Python $PYTHON_VERSION"
 echo ""
 
 # ================================
@@ -50,7 +60,7 @@ echo ""
 print_info "Installazione dipendenze sistema..."
 
 apt update && apt upgrade -y
-apt install -y python${PYTHON_VERSION} python3-venv python3-pip
+apt install -y python3 python3-venv python3-pip
 apt install -y postgresql postgresql-contrib
 apt install -y nginx
 apt install -y git
