@@ -131,14 +131,24 @@ DB_NAME=${DB_NAME:-${PROJECT_NAME}_db}
 read -p "Username database [$PROJECT_NAME""_user]: " DB_USER
 DB_USER=${DB_USER:-${PROJECT_NAME}_user}
 
-read -sp "Password database (min 12 caratteri) [$DB_PASS]: " DB_PASS
+#read -sp "Password database (min 12 caratteri) [$DB_PASS]: " DB_PASS
+#if [ ${#DB_PASS} -lt 12 ]; then
+#    print_error "Password troppo corta! Minimo 12 caratteri."
+#    exit 1
+#fi
 
+
+# Richiedi password con loop
+DB_PASS_T=""
+while [ ${#DB_PASS_T} -lt 12 ]; do
+    read -sp "Password database (min 12 caratteri) [$DB_PASS]: " DB_PASS_T
+    if [ -z "$DB_PASS_T" ]; then
+        DB_PASS_T=DB_PASS
+    fi
+done
+DB_PASS=DB_PASS_T
 echo ""
 
-if [ ${#DB_PASS} -lt 12 ]; then
-    print_error "Password troppo corta! Minimo 12 caratteri."
-    exit 1
-fi
 
 # Crea database se non esiste
 sudo -u postgres psql << EOSQL
