@@ -49,6 +49,10 @@ fi
 REPO_URL="https://github.com/turiliffiu/myapp.git"
 PROJECT_NAME="myapp"
 PROJECT_DIR="/opt/$PROJECT_NAME"
+#DB_NAME="dashboard_db"
+#DB_USER="dashboard_user"
+DB_PASS=$(openssl rand -base64 32 | tr -d "=+/" | cut -c1-25)
+
 
 print_info "Deploy di $PROJECT_NAME in $PROJECT_DIR"
 print_info "Usando Python $PYTHON_VERSION"
@@ -126,7 +130,8 @@ DB_NAME=${DB_NAME:-${PROJECT_NAME}_db}
 read -p "Username database [$PROJECT_NAME""_user]: " DB_USER
 DB_USER=${DB_USER:-${PROJECT_NAME}_user}
 
-read -sp "Password database (min 12 caratteri): " DB_PASS
+read -sp "Password database (min 12 caratteri) [$DB_PASS]: " DB_PASS
+
 echo ""
 
 if [ ${#DB_PASS} -lt 12 ]; then
