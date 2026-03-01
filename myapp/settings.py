@@ -130,12 +130,13 @@ CSRF_COOKIE_SAMESITE = 'Lax'
 
 # HTTPS Security (only when DEBUG=False)
 if not DEBUG:
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
-    SECURE_SSL_REDIRECT = True
-    SECURE_HSTS_SECONDS = 31536000
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-    SECURE_HSTS_PRELOAD = True
+    # Uncomment these lines ONLY after configuring SSL certificates:
+    # SESSION_COOKIE_SECURE = True
+    # CSRF_COOKIE_SECURE = True
+    # SECURE_SSL_REDIRECT = True
+    # SECURE_HSTS_SECONDS = 31536000
+    # SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    # SECURE_HSTS_PRELOAD = True
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     USE_X_FORWARDED_HOST = True
     X_FRAME_OPTIONS = 'DENY'
@@ -200,3 +201,8 @@ SIMPLE_JWT = {
     'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
     'TOKEN_TYPE_CLAIM': 'token_type',
 }
+# =============================================
+# Rate Limiting
+# =============================================
+# Required for django-ratelimit with Nginx reverse proxy
+RATELIMIT_IP_META_KEY = 'HTTP_X_FORWARDED_FOR'
