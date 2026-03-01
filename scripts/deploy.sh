@@ -143,10 +143,10 @@ DB_PASS_T=""
 while [ ${#DB_PASS_T} -lt 12 ]; do
     read -sp "Password database (min 12 caratteri) [$DB_PASS]: " DB_PASS_T
     if [ -z "$DB_PASS_T" ]; then
-        DB_PASS_T=DB_PASS
+        DB_PASS_T="$DB_PASS"
     fi
 done
-DB_PASS=DB_PASS_T
+DB_PASS="$DB_PASS_T"
 echo ""
 
 
