@@ -1,4 +1,4 @@
-# 🚀 MyFileHub - Deploy automatico su LXC Proxmox
+# 🚀 MyApp - Deploy automatico su LXC Proxmox
 
 ## 📦 Deploy in pochi Minuti
 **Prerequisiti:** Container LXC Ubuntu 24.04 su Proxmox
