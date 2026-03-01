@@ -157,12 +157,14 @@ echo ""
 # ================================
 print_info "Configurazione .env produzione..."
 
-read -p "Dominio principale (es: example.com): " DOMAIN
-
-if [ -z "$DOMAIN" ]; then
-    print_error "Dominio obbligatorio!"
-    exit 1
-fi
+# Richiedi dominio con loop
+DOMAIN=""
+while [ -z "$DOMAIN" ]; do
+    read -p "Dominio principale (es: example.com, 192.168.1.122): " DOMAIN
+    if [ -z "$DOMAIN" ]; then
+        print_error "Dominio obbligatorio! Premi Ctrl+C per uscire."
+    fi
+done
 
 # Genera SECRET_KEY
 SECRET_KEY=$(python${PYTHON_VERSION} -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())')
