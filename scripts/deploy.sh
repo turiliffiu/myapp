@@ -159,6 +159,8 @@ DO \$\$
 BEGIN
     IF NOT EXISTS (SELECT FROM pg_user WHERE usename = '$DB_USER') THEN
         CREATE USER $DB_USER WITH PASSWORD '$DB_PASS';
+    ELSE
+        ALTER USER $DB_USER WITH PASSWORD '$DB_PASS';
     END IF;
 END \$\$;
 
@@ -215,6 +217,10 @@ echo ""
 # ================================
 print_info "Django migrations e static files..."
 
+# Crea directory necessarie
+mkdir -p media
+mkdir -p staticfiles
+
 python manage.py makemigrations
 python manage.py migrate
 python manage.py collectstatic --noinput
@@ -254,7 +260,7 @@ ExecStart=$PROJECT_DIR/venv/bin/gunicorn \\
     --access-logfile /var/log/$PROJECT_NAME/access.log \\
     --error-logfile /var/log/$PROJECT_NAME/error.log \\
     --timeout 30 \\
-    myproject.wsgi:application
+    $PROJECT_NAME.wsgi:application
 
 Restart=on-failure
 RestartSec=5s
@@ -324,7 +330,8 @@ print_info "Fix permessi..."
 chown -R www-data:www-data $PROJECT_DIR
 chmod -R 755 $PROJECT_DIR
 chmod -R 775 $PROJECT_DIR/media
-chown www-data:www-data /var/log/$PROJECT_NAME
+chmod -R 775 $PROJECT_DIR/staticfiles
+chown -R www-data:www-data /var/log/$PROJECT_NAME
 
 print_success "Permessi configurati"
 echo ""
@@ -364,12 +371,22 @@ echo "================================"
 print_success "Deploy completato con successo!"
 echo "================================"
 echo ""
-echo "📋 Informazioni:"
+echo "📋 CREDENZIALI E INFORMAZIONI:"
 echo ""
-echo "  Progetto:    $PROJECT_NAME"
-echo "  Directory:   $PROJECT_DIR"
-echo "  Dominio:     https://$DOMAIN"
-echo "  Database:    $DB_NAME"
+echo "  🌐 URL Applicazione:"
+echo "     http://$DOMAIN"
+echo "     http://$DOMAIN/admin"
+echo "     http://$DOMAIN/apps"
+echo ""
+echo "  💾 Database PostgreSQL:"
+echo "     Nome:     $DB_NAME"
+echo "     User:     $DB_USER"
+echo "     Password: $DB_PASS"
+echo "     Host:     localhost"
+echo "     Port:     5432"
+echo ""
+echo "  📂 Directory:"
+echo "     $PROJECT_DIR"
 echo ""
 echo "📝 Comandi utili:"
 echo ""
