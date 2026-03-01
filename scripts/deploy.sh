@@ -353,8 +353,8 @@ echo ""
 # ================================
 print_info "Setup SSL Let's Encrypt..."
 
-read -p "Configurare SSL adesso? (s/n) [s]: " SETUP_SSL
-SETUP_SSL=${SETUP_SSL:-s}
+read -p "Configurare SSL adesso? (s/n) [n]: " SETUP_SSL
+SETUP_SSL=${SETUP_SSL:-n}
 
 if [ "$SETUP_SSL" = "s" ]; then
     certbot --nginx -d $DOMAIN -d www.$DOMAIN --non-interactive --agree-tos --email admin@$DOMAIN
