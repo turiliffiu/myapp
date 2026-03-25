@@ -128,6 +128,11 @@ SESSION_COOKIE_AGE = 86400  # 24 hours
 CSRF_COOKIE_HTTPONLY = False  # Allow JavaScript to read for Alpine.js
 CSRF_COOKIE_SAMESITE = 'Lax'
 
+# CSRF Trusted Origins (add your production domains)
+CSRF_TRUSTED_ORIGINS = [
+    # Add your production domains here when using HTTPS reverse proxy
+]
+
 # HTTPS Security (only when DEBUG=False)
 if not DEBUG:
     # Uncomment these lines ONLY after configuring SSL certificates:
@@ -204,5 +209,15 @@ SIMPLE_JWT = {
 # =============================================
 # Rate Limiting
 # =============================================
-# Required for django-ratelimit with Nginx reverse proxy
-RATELIMIT_IP_META_KEY = 'HTTP_X_FORWARDED_FOR'
+# Rate Limiting Configuration for Nginx Reverse Proxy
+def get_client_ip(request):
+    """Extract the real client IP from X-Forwarded-For header"""
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        # X-Forwarded-For can contain multiple IPs: "client, proxy1, proxy2"
+        # Take only the first one (the real client)
+        ip = x_forwarded_for.split(',')[0].strip()
+        return ip
+    return request.META.get('REMOTE_ADDR', '')
+
+RATELIMIT_IP_META_KEY = get_client_ip
