@@ -21,6 +21,7 @@ db.sqlite3-journal
 # Static files - allow structure but ignore contents
 static/*
 !static/.gitkeep
+!static/*.svg
 !static/*/
 static/*/*.css
 static/*/*.js
