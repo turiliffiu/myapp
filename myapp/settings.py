@@ -128,10 +128,8 @@ SESSION_COOKIE_AGE = 86400  # 24 hours
 CSRF_COOKIE_HTTPONLY = False  # Allow JavaScript to read for Alpine.js
 CSRF_COOKIE_SAMESITE = 'Lax'
 
-# CSRF Trusted Origins (add your production domains)
-CSRF_TRUSTED_ORIGINS = [
-    # Add your production domains here when using HTTPS reverse proxy
-]
+# CSRF Trusted Origins - read from environment variable
+CSRF_TRUSTED_ORIGINS = env.list('CSRF_TRUSTED_ORIGINS', default=[])
 
 # HTTPS Security (only when DEBUG=False)
 if not DEBUG:
